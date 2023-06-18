@@ -25,17 +25,33 @@ const invokeAction = async ({ action, id, name, email, phone }) => {
   }
 };
 
-program
-  .option('--action, <type>')
-  .option('--id, <type>')
-  .option('--name, <type>')
-  .option('--email, <type>')
-  .option('--phone, <type>');
+// program
+//   .option('--action, <type>')
+//   .option('--id, <type>')
+//   .option('--name, <type>')
+//   .option('--email, <type>')
+//   .option('--phone, <type>');
 
-program.parse();
+// program.parse();
 
-const options = program.opts();
-invokeAction(options);
+// const optionsObgect = program.opts();
+// invokeAction(optionsObgect);
+
+// ----------------------------------------- readline---------------------------------------- //
+
+// const readline = require('readline');
+// const rl = readline.createInterface({
+//   input: process.stdin, // input from standard stream
+//   output: process.stdout, // output to standard stream
+// });
+
+// rl.on('line', cmd => {
+//   console.log(`You just typed: ${cmd}`);
+// });
+
+// rl.question("What's your name?", answer => {
+//   console.log(`Nice to meet you ${answer}`);
+// });
 
 // -------------------------------------------yargs------------------------------------------ //
 
@@ -43,8 +59,8 @@ invokeAction(options);
 // const { hideBin } = require('yargs/helpers');
 
 // const arr = hideBin(process.argv);
-// const { argv } = yargs(arr);
-// invokeAction(argv);
+// const { argv: optionsObgect } = yargs(arr);
+// invokeAction(optionsObgect);
 
 // ------------------------------------------------------------------------------------------ //
 
@@ -59,3 +75,13 @@ invokeAction(options);
 //   const action = process.argv[actionIndex + 1];
 //   actionIndex({ action });
 // }
+
+// ------------------------------------------------------------------------------------------ //
+
+const number = require('./game/number');
+
+program.option('-f, --file <type>', 'file for saving game results', 'results.txt');
+program.parse(process.argv);
+program.opts().file;
+
+number.game();
