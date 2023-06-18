@@ -3,8 +3,8 @@ const fs = require('fs').promises;
 const { program } = require('commander');
 require('colors');
 
-program.option('-f, --file <type>', 'file for saving game results', 'results.txt');
-program.parse(process.argv);
+program.option('-f, --file [type]', 'file for saving game results', 'results.txt');
+program.parse();
 
 const rl = readline.createInterface({
   input: process.stdin,
