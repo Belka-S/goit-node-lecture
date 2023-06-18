@@ -1,6 +1,13 @@
 const { program } = require('commander');
+const readline = require('readline');
+require('colors');
 
 const contacts = require('./db');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
 const invokeAction = async ({ action, id, name, email, phone }) => {
   switch (action) {
@@ -26,16 +33,40 @@ const invokeAction = async ({ action, id, name, email, phone }) => {
 };
 
 program
-  .option('--action, <type>')
-  .option('--id, <type>')
-  .option('--name, <type>')
-  .option('--email, <type>')
-  .option('--phone, <type>');
+  .option('-a, --action, <type>')
+  .option('-i, --id, <value>')
+  .option('-n, --name, <value>')
+  .option('-e, --email, <value>')
+  .option('-p, --phone, <value>');
 
 program.parse();
 
 const options = program.opts();
+console.log(options);
 invokeAction(options);
+
+const modifyJson = () => {
+  rl.question('Choose action: r (read), g (getById), a (add), u (updateById), d (deleteById)?'.yellow, value => {
+    switch (value) {
+      case 'r':
+        rl.question(`To read you need to enter: -a -r (--read), take your choice! `.green, value => {
+          invokeAction();
+
+          modifyJson();
+        });
+
+        break;
+
+      default:
+        console.log('Wrong action!'.red);
+        modifyJson();
+        break;
+    }
+  });
+};
+
+// modifyJson();
+invokeAction();
 
 // -------------------------------------------yargs------------------------------------------ //
 
