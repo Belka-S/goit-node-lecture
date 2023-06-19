@@ -11,52 +11,89 @@ const rl = readline.createInterface({
 
 const invokeAction = async ({ action, id, name, email, phone }) => {
   switch (action) {
-    case 'read':
-      const allContacts = await contacts.getAll();
-      return console.log(allContacts);
-    case 'getById':
-      const oneContact = await contacts.getById(id);
-      return console.log(oneContact);
+    case 'list':
+      const allContacts = await contacts.listContacts();
+      console.log(allContacts);
+      modifyJson();
+      break;
+    case 'get':
+      const oneContact = await contacts.getContact(id);
+      console.log(oneContact);
+      modifyJson();
+      break;
     case 'add':
-      const newContact = await contacts.add({ name, email, phone });
-      return console.log(newContact);
-    case 'updateById':
-      const updatedContact = await contacts.updateById(id, { name, email, phone });
-      return console.log(updatedContact);
-    case 'deleteById':
-      const deletedContact = await contacts.deleteById(id);
-      return console.log(deletedContact);
-
+      const newContact = await contacts.addContact({ name, email, phone });
+      console.log(newContact);
+      modifyJson();
+      break;
+    case 'updateContact':
+      const updatedContact = await contacts.updateContact(id, { name, email, phone });
+      console.log(updatedContact);
+      modifyJson();
+      break;
+    case 'delete':
+      const deletedContact = await contacts.deleteContact(id);
+      console.log(deletedContact);
+      modifyJson();
+      break;
     default:
-      return console.log('Unknown action');
+      console.log('Unknown action');
+      modifyJson();
+      break;
   }
 };
 
 program
-  .option('-a, --action, <type>')
-  .option('-i, --id, <value>')
-  .option('-n, --name, <value>')
-  .option('-e, --email, <value>')
-  .option('-p, --phone, <value>');
+  .option('-a, --action <type>', 'choose action')
+  .option('-i, --id <value>', 'user id')
+  .option('-n, --name <value>', 'user name')
+  .option('-e, --email <value>', 'user email')
+  .option('-p, --phone <value>', 'user phone');
 
-program.parse();
-
-const options = program.opts();
-console.log(options);
-invokeAction(options);
+// program.parse(process.argv);
+// const optionsObgect = program.opts();
+// invokeAction(optionsObgect);
 
 const modifyJson = () => {
-  rl.question('Choose action: r (read), g (getById), a (add), u (updateById), d (deleteById)?'.yellow, value => {
+  const splitString = params =>
+    (' ' + params).split(/\s+-/).reduce((acc, el, i) => {
+      if (i > 0) {
+        acc.push('-' + el.substring(0, 1));
+        acc.push(el.substring(2));
+      }
+      return acc;
+    }, []);
+
+  rl.question('Choose action: l (list), g (get), a (add), u (update), d (delete)? '.yellow, value => {
     switch (value) {
-      case 'r':
-        rl.question(`To read you need to enter: -a -r (--read), take your choice! `.green, value => {
-          invokeAction();
-
-          modifyJson();
-        });
-
+      case 'l':
+        program.parse(['--action', 'list'], { from: 'user' });
+        invokeAction(program.opts());
         break;
-
+      case 'g':
+        rl.question('Enter -i <id>: '.green, params => {
+          program.parse(['--action', 'get', ...params.split(/\s+/)], { from: 'user' });
+          invokeAction(program.opts());
+        });
+        break;
+      case 'a':
+        rl.question('Enter -n <name> -e <email> -p <phone>: '.green, params => {
+          program.parse(['--action', 'add', ...splitString(params)], { from: 'user' });
+          invokeAction(program.opts());
+        });
+        break;
+      case 'u':
+        rl.question('Enter -i <id> -n <name> -e <email> -p <phone>: '.green, params => {
+          program.parse(['--action', 'updateContact', ...splitString(params)], { from: 'user' });
+          invokeAction(program.opts());
+        });
+        break;
+      case 'd':
+        rl.question('Enter -i <id>: '.green, params => {
+          program.parse(['--action', 'delete', ...params.split(/\s+/)], { from: 'user' });
+          invokeAction(program.opts());
+        });
+        break;
       default:
         console.log('Wrong action!'.red);
         modifyJson();
@@ -65,28 +102,4 @@ const modifyJson = () => {
   });
 };
 
-// modifyJson();
-invokeAction();
-
-// -------------------------------------------yargs------------------------------------------ //
-
-// const yargs = require('yargs');
-// const { hideBin } = require('yargs/helpers');
-
-// const arr = hideBin(process.argv);
-// const { argv } = yargs(arr);
-// invokeAction(argv);
-
-// ------------------------------------------------------------------------------------------ //
-
-// invokeAction({ action: 'read' });
-// invokeAction({ action: 'getById', id: 'qdggE76Jtbfd9eWJHrssH' });
-// invokeAction({ action: 'add', name: 'LeBron James', email: 'bron@mail.com', phone: '(253) 268-9375' });
-// invokeAction({ action: 'updateById', id: 'qdggE76Jtbfd9eWJHrssH', name: 'Michael Jordan', email: 'bron@mail.com', phone: '(253) 268-9375' });
-// invokeAction({ action: 'deleteById', id: 'dRpUz79kQa0qPrBQR5jWr' });
-
-// const actionIndex = process.argv.indexOf('--action');
-// if (actionIndex !== -1) {
-//   const action = process.argv[actionIndex + 1];
-//   actionIndex({ action });
-// }
+modifyJson();

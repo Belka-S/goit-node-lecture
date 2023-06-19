@@ -64,5 +64,17 @@
     "name": "LeBron James",
     "email": "bron@mail.com",
     "phone": "(253) 268-9375"
+  },
+  {
+    "id": "Eewdthur1JoIq7jbKIGTF",
+    "name": "Klay Thompson",
+    "email": "klay@mail.com",
+    "phone": "(234) 434-3856"
+  },
+  {
+    "id": "XZLdwYWo-2WrAjo-NcOP1",
+    "name": "Mahmoud Abdul-Rauf",
+    "email": "mar@mail.com",
+    "phone": "(234) 434-9999"
   }
 ]
