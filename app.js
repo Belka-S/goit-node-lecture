@@ -1,105 +1,38 @@
-const { program } = require('commander');
-const readline = require('readline');
-require('colors');
+const express = require('express');
+const moment = require('moment');
+const fs = require('fs/promises');
+const cors = require('cors');
 
-const contacts = require('./db');
+const app = express();
+const contactsRouter = require('./routes/api/contacts');
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
+// Allow cross-origin requests
+app.use(cors());
+
+// Tratsform JSON body
+app.use(express.json());
+
+// Write logs to file
+app.use((req, res, next) => {
+  const { method, url } = req;
+  const date = moment().format('DD-MM-YYYY_hh:mm:ss');
+  fs.appendFile('./data/server.log', `${method} ${url} ${date}\n`);
+  next();
 });
 
-const invokeAction = async ({ action, id, name, email, phone }) => {
-  switch (action) {
-    case 'list':
-      const allContacts = await contacts.listContacts();
-      console.log(allContacts);
-      modifyJson();
-      break;
-    case 'get':
-      const oneContact = await contacts.getContact(id);
-      console.log(oneContact);
-      modifyJson();
-      break;
-    case 'add':
-      const newContact = await contacts.addContact({ name, email, phone });
-      console.log(newContact);
-      modifyJson();
-      break;
-    case 'updateContact':
-      const updatedContact = await contacts.updateContact(id, { name, email, phone });
-      console.log(updatedContact);
-      modifyJson();
-      break;
-    case 'delete':
-      const deletedContact = await contacts.deleteContact(id);
-      console.log(deletedContact);
-      modifyJson();
-      break;
-    default:
-      console.log('Unknown action');
-      modifyJson();
-      break;
-  }
-};
+// Get Contacts
+app.use('/api/contacts', contactsRouter);
 
-program
-  .option('-a, --action <type>', 'choose action')
-  .option('-i, --id <value>', 'user id')
-  .option('-n, --name <value>', 'user name')
-  .option('-e, --email <value>', 'user email')
-  .option('-p, --phone <value>', 'user phone');
+// Get HomePage
+app.get('/', (req, res) => {
+  console.log(req.method, req.url);
+  res.send('<h2>Home Page</h2>');
+});
 
-// program.parse(process.argv);
-// const optionsObgect = program.opts();
-// invokeAction(optionsObgect);
+// Send 404 error
+app.use((res, req) => {
+  res.status(404).json({ error: 'Not found' });
+});
 
-const modifyJson = () => {
-  const splitString = params =>
-    (' ' + params).split(/\s+-/).reduce((acc, el, i) => {
-      if (i > 0) {
-        acc.push('-' + el.substring(0, 1));
-        acc.push(el.substring(2));
-      }
-      return acc;
-    }, []);
-
-  rl.question('Choose action: l (list), g (get), a (add), u (update), d (delete)? '.yellow, value => {
-    switch (value) {
-      case 'l':
-        program.parse(['--action', 'list'], { from: 'user' });
-        invokeAction(program.opts());
-        break;
-      case 'g':
-        rl.question('Enter -i <id>: '.green, params => {
-          program.parse(['--action', 'get', ...params.split(/\s+/)], { from: 'user' });
-          invokeAction(program.opts());
-        });
-        break;
-      case 'a':
-        rl.question('Enter -n <name> -e <email> -p <phone>: '.green, params => {
-          program.parse(['--action', 'add', ...splitString(params)], { from: 'user' });
-          invokeAction(program.opts());
-        });
-        break;
-      case 'u':
-        rl.question('Enter -i <id> -n <name> -e <email> -p <phone>: '.green, params => {
-          program.parse(['--action', 'updateContact', ...splitString(params)], { from: 'user' });
-          invokeAction(program.opts());
-        });
-        break;
-      case 'd':
-        rl.question('Enter -i <id>: '.green, params => {
-          program.parse(['--action', 'delete', ...params.split(/\s+/)], { from: 'user' });
-          invokeAction(program.opts());
-        });
-        break;
-      default:
-        console.log('Wrong action!'.red);
-        modifyJson();
-        break;
-    }
-  });
-};
-
-modifyJson();
+// Run server on port
+app.listen(3001, () => console.log('Server is running!'));
