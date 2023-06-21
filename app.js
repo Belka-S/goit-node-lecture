@@ -9,6 +9,9 @@ const contactsRouter = require('./routes/api/contacts');
 // Allow cross-origin requests
 app.use(cors());
 
+// Tratsform JSON body
+app.use(express.json());
+
 // Write logs to file
 app.use((req, res, next) => {
   const { method, url } = req;
@@ -22,7 +25,7 @@ app.use('/api/contacts', contactsRouter);
 
 // Get HomePage
 app.get('/', (req, res) => {
-  console.log(req.url, req.method);
+  console.log(req.method, req.url);
   res.send('<h2>Home Page</h2>');
 });
 
@@ -32,4 +35,4 @@ app.use((res, req) => {
 });
 
 // Run server on port
-app.listen(3012, () => console.log('Server is running!'));
+app.listen(3001, () => console.log('Server is running!'));
