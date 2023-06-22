@@ -2,14 +2,14 @@ const express = require('express');
 const moment = require('moment');
 const fs = require('fs/promises');
 const cors = require('cors');
+const logger = require('morgan');
 
 const app = express();
 const contactsRouter = require('./routes/api/contacts');
+const fotmatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
 
-// Allow cross-origin requests
+app.use(logger(fotmatsLogger));
 app.use(cors());
-
-// Tratsform JSON body
 app.use(express.json());
 
 // Write logs to file
@@ -23,16 +23,12 @@ app.use((req, res, next) => {
 // Get Contacts
 app.use('/api/contacts', contactsRouter);
 
-// Get HomePage
-app.get('/', (req, res) => {
-  console.log(req.method, req.url);
-  res.send('<h2>Home Page</h2>');
-});
-
-// Send 404 error
-app.use((res, req) => {
-  res.status(404).json({ error: 'Not found' });
+// Send error
+app.use((err, req, res, next) => {
+  const { status = 500, code, message = 'Server error!' } = err;
+  res.status(status).json({ message: err.message });
 });
 
 // Run server on port
-app.listen(3001, () => console.log('Server is running!'));
+const PORT = 3001;
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
