@@ -16,11 +16,11 @@ app.use(express.json());
 app.use((req, res, next) => {
   const { method, url } = req;
   const date = moment().format('DD-MM-YYYY_hh:mm:ss');
-  fs.appendFile('./data/server.log', `${method} ${url} ${date}\n`);
+  fs.appendFile('./app.log', `${method} ${url} ${date}\n`);
   next();
 });
 
-// Get Contacts
+// Contacts operations
 app.use('/api/contacts', contactsRouter);
 
 // Send error

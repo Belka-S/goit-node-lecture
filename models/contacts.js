@@ -17,6 +17,7 @@ const getContact = async id => {
 
 // POST
 const addContact = async data => {
+  console.log(data);
   const allContacts = await listContacts();
   const newContact = { id: nanoid(), ...data };
   allContacts.push(newContact);
