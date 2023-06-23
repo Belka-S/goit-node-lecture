@@ -23,6 +23,11 @@ app.use((req, res, next) => {
 // Contacts operations
 app.use('/api/contacts', contactsRouter);
 
+// Not found address error
+app.use((req, res) => {
+  res.status(404).json({ message: 'Not found' });
+});
+
 // Send error
 app.use((err, req, res, next) => {
   const { status = 500, code, message = 'Server error!' } = err;
