@@ -8,15 +8,15 @@ const app = express();
 const contactsRouter = require('./routes/api/contacts');
 const fotmatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
 
-app.use(logger(fotmatsLogger));
-app.use(cors());
-app.use(express.json());
+app.use(logger(fotmatsLogger)); // Write logs
+app.use(cors()); // Enable CORS
+app.use(express.json()); // Parse JSON
 
 // Write logs to file
 app.use((req, res, next) => {
   const { method, url } = req;
   const date = moment().format('DD-MM-YYYY_hh:mm:ss');
-  fs.appendFile('./app.log', `${method} ${url} ${date}\n`);
+  fs.appendFile('./server.log', `${method} ${url} ${date}\n`);
   next();
 });
 
@@ -34,6 +34,4 @@ app.use((err, req, res, next) => {
   res.status(status).json({ message: err.message });
 });
 
-// Run server on port
-const PORT = 3001;
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+module.exports = app;
