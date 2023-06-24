@@ -1,37 +1,43 @@
+const createError = require('http-errors');
 const express = require('express');
-const moment = require('moment');
-const fs = require('fs/promises');
-const cors = require('cors');
+const path = require('path');
+const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+// const loginRouter = require('./routes/login');
+
 const app = express();
-const contactsRouter = require('./routes/api/contacts');
-const fotmatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
 
-app.use(logger(fotmatsLogger)); // Write logs
-app.use(cors()); // Enable CORS
-app.use(express.json()); // Parse JSON
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
-// Write logs to file
-app.use((req, res, next) => {
-  const { method, url } = req;
-  const date = moment().format('DD-MM-YYYY_hh:mm:ss');
-  fs.appendFile('./server.log', `${method} ${url} ${date}\n`);
-  next();
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+// app.use('/login', loginRouter);
+
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+  next(createError(404));
 });
 
-// Contacts operations
-app.use('/api/contacts', contactsRouter);
+// error handler
+app.use(function (err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-// Not found address error
-app.use((req, res) => {
-  res.status(404).json({ message: 'Not found' });
-});
-
-// Send error
-app.use((err, req, res, next) => {
-  const { status = 500, code, message = 'Server error!' } = err;
-  res.status(status).json({ message: err.message });
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
 });
 
 module.exports = app;
