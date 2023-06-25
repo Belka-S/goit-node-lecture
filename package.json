@@ -12,6 +12,7 @@
   "author": "BS",
   "license": "ISC",
   "dependencies": {
+    "cjs-loader": "^0.1.0",
     "colors": "^1.4.0",
     "commander": "^11.0.0",
     "cors": "^2.8.5",
