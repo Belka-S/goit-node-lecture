@@ -18,6 +18,7 @@ const contactSchema = new Schema(
       type: String,
       match: [phoneRegex, 'Phone schema: (123) 456-7890'],
       required: true,
+      unique: true,
     },
     favorite: { type: Boolean, default: false },
     group: {
