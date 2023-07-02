@@ -4,8 +4,17 @@ const { Contact } = require('../models/contact');
 
 // GET
 const getAll = async (req, res) => {
-  const contacts = await Contact.find();
-  res.json({ status: 'success', code: 200, data: { result: contacts } });
+  const owner = req.user._id;
+  const { page = 1, limit = 5, ...query } = req.query;
+  const projection = '-createdAt -updatedAt';
+  const skip = (page - 1) * limit;
+
+  const contacts = await Contact.find({ owner, ...query }, projection, { skip, limit }).populate(
+    'owner',
+    'name email',
+  );
+  const total = await Contact.countDocuments({ owner, ...query });
+  res.json({ status: `success, ${total} contacts`, code: 200, data: { result: contacts } });
 };
 
 const getById = async (req, res) => {
@@ -17,7 +26,8 @@ const getById = async (req, res) => {
 
 // POST
 const add = async (req, res) => {
-  const newContact = await Contact.create(req.body);
+  const { _id: owner } = req.user;
+  const newContact = await Contact.create({ ...req.body, owner });
   res.status(201).json({ status: 'success', code: 201, data: { result: newContact } });
 };
 
