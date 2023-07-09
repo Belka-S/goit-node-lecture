@@ -2,15 +2,21 @@ const express = require('express');
 
 const { users } = require('../../controllers');
 const { ctrlWrapper } = require('../../helpers');
-const { validateBody, isValidId } = require('../../middlewares');
+const { validateBody, isValidId, authenticate, upload } = require('../../middlewares');
 const { schemas } = require('../../models/user');
 
 const router = express.Router();
 
-// GET
+// Get all users
 router.get('/', ctrlWrapper(users.getAll));
 
-// PATCH
+// Get current user
+router.get('/current', authenticate, ctrlWrapper(users.getCurrent));
+
+// Update avatar
+router.patch('/avatars', authenticate, upload.single('avatar'), ctrlWrapper(users.updateAvatar));
+
+// Update subscription
 router.patch(
   '/:id',
   isValidId,

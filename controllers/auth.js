@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const gravatar = require('gravatar');
 
 const { User } = require('../models/user');
 const { HttpError } = require('../helpers');
@@ -17,9 +18,10 @@ const register = async (req, res) => {
     throw HttpError(409, 'Email already exists');
   }
   const hashPassword = await bcrypt.hash(password, 10);
+  const avatarUrl = gravatar.url(email);
 
-  const newUser = await User.create({ ...req.body, password: hashPassword });
-  res.status(201).json({ name: newUser.name, email: newUser.email });
+  const newUser = await User.create({ ...req.body, password: hashPassword, avatarUrl });
+  res.status(201).json({ name: newUser.name, email: newUser.email, avatarUrl: newUser.avatarUrl });
 };
 
 // Login // SignIn
@@ -41,15 +43,10 @@ const login = async (req, res) => {
   res.json({ token });
 };
 
-const getCurrent = async (req, res) => {
-  const { name, email } = req.user;
-  res.json({ name, email });
-};
-
 // Logout
 const logout = async (req, res) => {
   await User.findByIdAndUpdate(req.user._id, { token: null });
   res.status(204); // .json({ message: 'Logged out' });
 };
 
-module.exports = { register, login, getCurrent, logout };
+module.exports = { register, login, logout };

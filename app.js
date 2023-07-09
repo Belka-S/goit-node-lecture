@@ -14,6 +14,7 @@ const fotmatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
 app.use(logger(fotmatsLogger)); // Write logs
 app.use(cors()); // Enable CORS
 app.use(express.json()); // Parse JSON
+app.use(express.static('public')); // Serve static files
 
 // Write logs to file
 app.use((req, res, next) => {

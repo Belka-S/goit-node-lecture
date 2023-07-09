@@ -1,7 +1,7 @@
 const { Schema, model } = require('mongoose');
 const Joi = require('joi');
 
-const { mongooseError } = require('../helpers');
+const { mongooseError, joiHandler } = require('../helpers');
 
 // Validation
 const phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/;
@@ -37,8 +37,8 @@ const contactSchema = new Schema(
 
 const addSchema = Joi.object({
   name: Joi.string().min(3).required(),
-  email: Joi.string().pattern(emailRegex).message('Invalid email!'),
-  phone: Joi.string().pattern(phoneRegex).message('Invalid phone!'),
+  email: Joi.string().pattern(emailRegex).error(joiHandler.emailError),
+  phone: Joi.string().pattern(phoneRegex).error(joiHandler.emailError),
   favorite: Joi.boolean(),
   group: Joi.string()
     .valid(...groupList)
