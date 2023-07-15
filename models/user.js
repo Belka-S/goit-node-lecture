@@ -35,6 +35,8 @@ const userSchema = new Schema(
       default: null,
     },
     avatarUrl: { type: String, required: true },
+    verified: { type: Boolean, default: false },
+    verificationCode: { type: String, default: '' },
   },
   { versionKey: false, timestamps: true },
 );
@@ -56,9 +58,13 @@ const updateSubscriptionSchema = Joi.object({
     .required(),
 });
 
+const emailVerificationSchema = Joi.object({
+  email: Joi.string().email(emailRegex).required().error(joiError.emailError),
+});
+
 userSchema.post('save', mongooseError); // Change error status
 
-const schemas = { registerSchema, loginSchema, updateSubscriptionSchema };
+const schemas = { registerSchema, loginSchema, updateSubscriptionSchema, emailVerificationSchema };
 
 const User = model('user', userSchema);
 

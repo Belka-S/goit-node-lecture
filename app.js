@@ -1,33 +1,34 @@
 const express = require('express');
-const moment = require('moment');
-const fs = require('fs/promises');
 const cors = require('cors');
 const logger = require('morgan');
 require('dotenv').config();
 
 const app = express();
+const path = require('path');
 const contactsRouter = require('./routes/api/contacts');
 const usersRouter = require('./routes/api/users');
 const authRouter = require('./routes/api/auth');
+const feedbackRouter = require('./routes/feedback');
 const fotmatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
+const { logFile } = require('./helpers');
 
 app.use(logger(fotmatsLogger)); // Write logs
 app.use(cors()); // Enable CORS
 app.use(express.json()); // Parse JSON
-app.use(express.static('public')); // Serve static files
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
 
 // Write logs to file
-app.use((req, res, next) => {
-  const { method, url } = req;
-  const date = moment().format('DD-MM-YYYY_hh:mm:ss');
-  fs.appendFile('./server.log', `${method} ${url} ${date}\n`);
-  next();
-});
+app.use(logFile);
+
+// Feedback form
+app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: false }));
 
 // Routes
 app.use('/api/contacts', contactsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
+app.use('/feedback', feedbackRouter);
 
 // Not found address error
 app.use((req, res) => {

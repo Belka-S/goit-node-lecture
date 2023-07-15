@@ -1,9 +1,10 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
+const { nanoid } = require('nanoid');
 
 const { User } = require('../models/user');
-const { HttpError } = require('../helpers');
+const { HttpError, sendEmail } = require('../helpers');
 
 const { SECRET_KEY } = process.env;
 
@@ -19,8 +20,16 @@ const register = async (req, res) => {
   }
   const hashPassword = await bcrypt.hash(password, 10);
   const avatarUrl = gravatar.url(email);
+  const verificationCode = nanoid();
 
-  const newUser = await User.create({ ...req.body, password: hashPassword, avatarUrl });
+  await sendEmail(email, verificationCode);
+
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarUrl,
+    verificationCode,
+  });
   res.status(201).json({ name: newUser.name, email: newUser.email, avatarUrl: newUser.avatarUrl });
 };
 
@@ -32,7 +41,10 @@ const login = async (req, res) => {
   if (!user) {
     throw HttpError(401, 'User or password invalid');
   }
-  const isMatch = await bcrypt.compare(password, user.password);
+  if (user.verified) {
+    throw HttpError(401, 'Email not verified');
+  }
+  const isMatch = bcrypt.compare(password, user.password); // await ???
   if (!isMatch) {
     throw HttpError(401, 'User or password invalid');
   }

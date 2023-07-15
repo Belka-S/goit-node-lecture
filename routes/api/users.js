@@ -24,4 +24,13 @@ router.patch(
   ctrlWrapper(users.updateSubscriptionById),
 );
 
+// Verify email
+router.get('/verify/:verificationCode', ctrlWrapper(users.verifyEmail));
+
+router.post(
+  '/verify',
+  validateBody(schemas.emailVerificationSchema),
+  ctrlWrapper(users.resendVerificationEmail),
+);
+
 module.exports = router;
