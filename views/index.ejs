@@ -1,37 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css" />
-  <title>feedback</title>
+  <title>EJS compilation demo</title>
+  <style></style>
 </head>
 
 <body>
-  <section class="contacts">
-    <div class="container">
-      <form class="form" id="mail" action="/feedback" method="POST" enctype="application/x-www-form-urlencoded"
-        accept-charset="UTF-8">
-        <h2 class="row">Send your feedback</h2>
-        <div class="row">
-          <label>
-            <input class="u-full-width" name="name" type="text" placeholder="Name" />
-          </label>
-        </div>
-        <div class="row">
-          <label>
-            <input class="u-full-width" name="email" type="email" placeholder="E-mail" />
-          </label>
-        </div>
-        <textarea class="u-full-width" placeholder="Your message" name="text"></textarea>
-        <div class="row">
-          <button class="button-primary" type="submit">Send</button>
-          <button class="button-primary" type="reset">Clean</button>
-        </div>
-      </form>
-    </div>
-  </section>
+  <% const whiskyView=(item, i)=>{ %>
+    <tr>
+      <td>
+        <%= i %>
+      </td>
+      <td>
+        <%= item.product_country_origin_name %>
+      </td>
+      <td>
+        <%= item.product_long_name %>
+      </td>
+      <td>
+        <%= item.product_litres_per_container %>
+      </td>
+      <td>
+        <%= item.product_alcohol_percent %>%
+      </td>
+      <td>
+        $<%= Math.round(item.current_display_price) %>
+      </td>
+    </tr>
+    <% } %>
+
+      <table border="1" style="border-collapse: collapse">
+        <tr>
+          <td>№</td>
+          <td>Country</td>
+          <td>Name</td>
+          <td>Volume</td>
+          <td>Alcohol</td>
+          <td>Price</td>
+        </tr>
+        <% whisky.map(whiskyView) %>
+      </table>
 </body>
 
 </html>
