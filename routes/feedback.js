@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { sendFeedback } = require('../helpers');
+// const { sendFeedback } = require('../helpers');
 
 const router = express.Router();
 
@@ -8,6 +8,6 @@ router.get('/', (req, res) => {
   res.render('index');
 });
 
-router.post('/', sendFeedback);
+// router.post('/', sendFeedback);
 
 module.exports = router;
